@@ -24,6 +24,14 @@
 		AB325CB816CC071B00653AD3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB325C9016CC071B00653AD3 /* Foundation.framework */; };
 		AB325CC016CC071B00653AD3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB325CBE16CC071B00653AD3 /* InfoPlist.strings */; };
 		AB325CC316CC071B00653AD3 /* ClaraBellTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AB325CC216CC071B00653AD3 /* ClaraBellTests.m */; };
+		AB325CCD16CC930D00653AD3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB325CCC16CC930D00653AD3 /* QuartzCore.framework */; };
+		AB325CCF16CCA9BF00653AD3 /* arrow0.png in Resources */ = {isa = PBXBuildFile; fileRef = AB325CCE16CCA9BF00653AD3 /* arrow0.png */; };
+		AB325CD116CCAD9000653AD3 /* icon.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB325CD016CCAD8F00653AD3 /* icon.jpg */; };
+		AB325CD316CCAF3D00653AD3 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = AB325CD216CCAF3D00653AD3 /* icon.png */; };
+		AB325CD516CCAF7400653AD3 /* iconsmall.png in Resources */ = {isa = PBXBuildFile; fileRef = AB325CD416CCAF7400653AD3 /* iconsmall.png */; };
+		AB922F4616CEE99300845E85 /* ISight_Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = AB922F4516CEE99300845E85 /* ISight_Logo.png */; };
+		AB922F4816CF254300845E85 /* target.png in Resources */ = {isa = PBXBuildFile; fileRef = AB922F4716CF254300845E85 /* target.png */; };
+		AB922F4A16D05C8B00845E85 /* motiongrid.png in Resources */ = {isa = PBXBuildFile; fileRef = AB922F4916D05C8B00845E85 /* motiongrid.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +68,14 @@
 		AB325CBF16CC071B00653AD3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		AB325CC116CC071B00653AD3 /* ClaraBellTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClaraBellTests.h; sourceTree = "<group>"; };
 		AB325CC216CC071B00653AD3 /* ClaraBellTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClaraBellTests.m; sourceTree = "<group>"; };
+		AB325CCC16CC930D00653AD3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		AB325CCE16CCA9BF00653AD3 /* arrow0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arrow0.png; sourceTree = "<group>"; };
+		AB325CD016CCAD8F00653AD3 /* icon.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = icon.jpg; sourceTree = "<group>"; };
+		AB325CD216CCAF3D00653AD3 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		AB325CD416CCAF7400653AD3 /* iconsmall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iconsmall.png; sourceTree = "<group>"; };
+		AB922F4516CEE99300845E85 /* ISight_Logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ISight_Logo.png; sourceTree = SOURCE_ROOT; };
+		AB922F4716CF254300845E85 /* target.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = target.png; sourceTree = SOURCE_ROOT; };
+		AB922F4916D05C8B00845E85 /* motiongrid.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = motiongrid.png; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB325CCD16CC930D00653AD3 /* QuartzCore.framework in Frameworks */,
 				AB325C8F16CC071B00653AD3 /* UIKit.framework in Frameworks */,
 				AB325C9116CC071B00653AD3 /* Foundation.framework in Frameworks */,
 				AB325C9316CC071B00653AD3 /* CoreGraphics.framework in Frameworks */,
@@ -89,6 +106,9 @@
 		AB325C7F16CC071B00653AD3 = {
 			isa = PBXGroup;
 			children = (
+				AB325CD416CCAF7400653AD3 /* iconsmall.png */,
+				AB325CD216CCAF3D00653AD3 /* icon.png */,
+				AB325CCC16CC930D00653AD3 /* QuartzCore.framework */,
 				AB325C9416CC071B00653AD3 /* ClaraBell */,
 				AB325CBB16CC071B00653AD3 /* ClaraBellTests */,
 				AB325C8D16CC071B00653AD3 /* Frameworks */,
@@ -123,6 +143,11 @@
 				AB325C9E16CC071B00653AD3 /* AppDelegate.m */,
 				AB325CA616CC071B00653AD3 /* MainStoryboard_iPhone.storyboard */,
 				AB325CA916CC071B00653AD3 /* MainStoryboard_iPad.storyboard */,
+				AB922F4916D05C8B00845E85 /* motiongrid.png */,
+				AB922F4716CF254300845E85 /* target.png */,
+				AB922F4516CEE99300845E85 /* ISight_Logo.png */,
+				AB325CD016CCAD8F00653AD3 /* icon.jpg */,
+				AB325CCE16CCA9BF00653AD3 /* arrow0.png */,
 				AB325CAC16CC071B00653AD3 /* ViewController.h */,
 				AB325CAD16CC071B00653AD3 /* ViewController.m */,
 				AB325C9516CC071B00653AD3 /* Supporting Files */,
@@ -240,6 +265,13 @@
 				AB325CA516CC071B00653AD3 /* Default-568h@2x.png in Resources */,
 				AB325CA816CC071B00653AD3 /* MainStoryboard_iPhone.storyboard in Resources */,
 				AB325CAB16CC071B00653AD3 /* MainStoryboard_iPad.storyboard in Resources */,
+				AB325CCF16CCA9BF00653AD3 /* arrow0.png in Resources */,
+				AB325CD116CCAD9000653AD3 /* icon.jpg in Resources */,
+				AB325CD316CCAF3D00653AD3 /* icon.png in Resources */,
+				AB325CD516CCAF7400653AD3 /* iconsmall.png in Resources */,
+				AB922F4616CEE99300845E85 /* ISight_Logo.png in Resources */,
+				AB922F4816CF254300845E85 /* target.png in Resources */,
+				AB922F4A16D05C8B00845E85 /* motiongrid.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,10 +421,13 @@
 		AB325CC716CC071B00653AD3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=*]" = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jonathan Appavoo (LJ3776LMRE)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClaraBell/ClaraBell-Prefix.pch";
 				INFOPLIST_FILE = "ClaraBell/ClaraBell-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -400,10 +435,12 @@
 		AB325CC816CC071B00653AD3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jonathan Appavoo (LJ3776LMRE)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClaraBell/ClaraBell-Prefix.pch";
 				INFOPLIST_FILE = "ClaraBell/ClaraBell-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -461,6 +498,7 @@
 				AB325CC816CC071B00653AD3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AB325CC916CC071B00653AD3 /* Build configuration list for PBXNativeTarget "ClaraBellTests" */ = {
 			isa = XCConfigurationList;
@@ -469,6 +507,7 @@
 				AB325CCB16CC071B00653AD3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
