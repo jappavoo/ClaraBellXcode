@@ -32,6 +32,8 @@
 		AB922F4616CEE99300845E85 /* ISight_Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = AB922F4516CEE99300845E85 /* ISight_Logo.png */; };
 		AB922F4816CF254300845E85 /* target.png in Resources */ = {isa = PBXBuildFile; fileRef = AB922F4716CF254300845E85 /* target.png */; };
 		AB922F4A16D05C8B00845E85 /* motiongrid.png in Resources */ = {isa = PBXBuildFile; fileRef = AB922F4916D05C8B00845E85 /* motiongrid.png */; };
+		AB922F4F16D19B5E00845E85 /* MotorControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = AB922F4E16D19B5E00845E85 /* MotorControlView.m */; };
+		AB922F5216D1FED600845E85 /* ClaraBell.c in Sources */ = {isa = PBXBuildFile; fileRef = AB922F5116D1FED600845E85 /* ClaraBell.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +78,10 @@
 		AB922F4516CEE99300845E85 /* ISight_Logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ISight_Logo.png; sourceTree = SOURCE_ROOT; };
 		AB922F4716CF254300845E85 /* target.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = target.png; sourceTree = SOURCE_ROOT; };
 		AB922F4916D05C8B00845E85 /* motiongrid.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = motiongrid.png; sourceTree = SOURCE_ROOT; };
+		AB922F4D16D19B5E00845E85 /* MotorControlView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MotorControlView.h; sourceTree = "<group>"; };
+		AB922F4E16D19B5E00845E85 /* MotorControlView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MotorControlView.m; sourceTree = "<group>"; };
+		AB922F5016D1E1DA00845E85 /* ClaraBell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClaraBell.h; sourceTree = SOURCE_ROOT; };
+		AB922F5116D1FED600845E85 /* ClaraBell.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ClaraBell.c; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,8 +154,12 @@
 				AB922F4516CEE99300845E85 /* ISight_Logo.png */,
 				AB325CD016CCAD8F00653AD3 /* icon.jpg */,
 				AB325CCE16CCA9BF00653AD3 /* arrow0.png */,
+				AB922F5116D1FED600845E85 /* ClaraBell.c */,
+				AB922F5016D1E1DA00845E85 /* ClaraBell.h */,
 				AB325CAC16CC071B00653AD3 /* ViewController.h */,
 				AB325CAD16CC071B00653AD3 /* ViewController.m */,
+				AB922F4D16D19B5E00845E85 /* MotorControlView.h */,
+				AB922F4E16D19B5E00845E85 /* MotorControlView.m */,
 				AB325C9516CC071B00653AD3 /* Supporting Files */,
 			);
 			path = ClaraBell;
@@ -309,6 +319,8 @@
 				AB325C9B16CC071B00653AD3 /* main.m in Sources */,
 				AB325C9F16CC071B00653AD3 /* AppDelegate.m in Sources */,
 				AB325CAE16CC071B00653AD3 /* ViewController.m in Sources */,
+				AB922F4F16D19B5E00845E85 /* MotorControlView.m in Sources */,
+				AB922F5216D1FED600845E85 /* ClaraBell.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

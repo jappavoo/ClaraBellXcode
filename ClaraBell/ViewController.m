@@ -7,15 +7,15 @@
 //
 
 #import "ViewController.h"
+#import "MotorControlView.h"
 #import <QuartzCore/QuartzCore.h>
+#include "ClaraBell.h"
+
+#define CUSTOM_DRAW_BORDER 8
+#define CUSTOM_DRAW_ORIGIN_X 5
+#define CUSTOM_DRAW_ORIGIN_Y 20
 
 static inline double radians (double degrees) { return degrees * M_PI/180; }
-#define LINELEN 80
-uint8_t line[LINELEN];
-int     linelen=0;
-int d0,d1,d2,d3,prox;
-enum {NONE=0, FORWARD, BACKWARD, LEFT, RIGHT} dir=NONE;
-enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
 
 @interface ViewController ()
 
@@ -27,22 +27,25 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
 @synthesize serverPort = _serverPort;
 @synthesize inputStream = _inputStream;
 @synthesize outputStream = _outputStream;
-@synthesize state = _state;
 @synthesize customDrawn = _customDrawn;
+
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    d0 = rand() % 200;
-    d1 = rand() % 200;
-    d2 = rand() % 200;
-    d3 = rand() % 100;
-    prox = 0;
+    cb.d0 = CB_SENSOR_MAX_DISTANCE;
+    cb.d1 = CB_SENSOR_MAX_DISTANCE;
+    cb.d2 = CB_SENSOR_MAX_DISTANCE;
+    cb.d3 = CB_SENSOR_MAX_DISTANCE;
+    cb.prox = 0;
+
 	// Do any additional setup after loading the view, typically from a nib.
     self.customDrawn = [CALayer layer];
     self.customDrawn.delegate = self;
     self.customDrawn.backgroundColor = [UIColor greenColor].CGColor;
-    self.customDrawn.frame = CGRectMake(5, 20, 410, 410);
+    self.customDrawn.frame = CGRectMake(CUSTOM_DRAW_ORIGIN_X, CUSTOM_DRAW_ORIGIN_Y,
+                                        2 * CB_SENSOR_MAX_DISTANCE+CUSTOM_DRAW_BORDER,
+                                        2 * CB_SENSOR_MAX_DISTANCE+CUSTOM_DRAW_BORDER);
     self.customDrawn.shadowOffset = CGSizeMake(0, 3);
     self.customDrawn.shadowRadius = 5.0;
     self.customDrawn.shadowColor = [UIColor blackColor].CGColor;
@@ -51,8 +54,21 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
     self.customDrawn.borderColor = [UIColor whiteColor].CGColor;
     self.customDrawn.borderWidth = 2.0;
     self.customDrawn.masksToBounds = YES;
+
     [self.view.layer addSublayer:self.customDrawn];
+
+    CGRect  viewRect = CGRectMake(493, 20, 525, 700);
+    self.motorControlView = [[MotorControlView alloc] initWithFrame:viewRect];
+    NSString *imgFilepath = [[NSBundle mainBundle] pathForResource:@"motiongrid" ofType:@"png"];
+    UIImage *img = [[UIImage alloc] initWithContentsOfFile:imgFilepath];
+    [self.motorControlView setImage:img];
+    
+    self.motorControlView.userInteractionEnabled=YES;
+    [self.view addSubview:self.motorControlView];
+    
     [self.customDrawn setNeedsDisplay];
+    
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -63,9 +79,9 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
 
 - (IBAction)connect:(id)sender {
     
-    if (self.state == CONNECTED) return;
+    if (cb.cstate == CONNECTED) return;
     
-    if (self.state == DISCONNECTED) {
+    if (cb.cstate == DISCONNECTED) {
         self.serverAddr = self.serverAddrField.text;
         self.serverPort = self.serverPortField.text;
 
@@ -93,7 +109,8 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
             [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
             [self.inputStream open];
             [self.outputStream open];
-            self.state = CONNECTING;
+            self.motorControlView.motorOutputStream = self.outputStream;
+            cb.cstate = CONNECTING;
             NSLog(@"connecting");
         }
     }
@@ -112,7 +129,7 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
 		case NSStreamEventOpenCompleted:
         {
 			NSLog(@"Stream opened");
-            self.state = CONNECTED;
+            cb.cstate = CONNECTED;
             NSString *msg = [[NSString alloc] initWithFormat:@"connected to %@:%@", self.serverAddr, self.serverPort];
             self.status.text = msg;
 
@@ -127,12 +144,12 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
                     len = [self.inputStream read:buffer maxLength:sizeof(buffer)];
                     if (len > 0) {
                         for (i=0; i<len; i++) {
-                            line[linelen]=buffer[i];
-                            linelen++;
-                            if (line[linelen-1]=='\n' || linelen==LINELEN-1) {
-                                line[linelen]=0;
-                                sscanf((const char *)line,"%d %d %d %d %d",
-                                       &d0, &d1, &d2, &d3, &prox);
+                            cb.line[cb.linelen]=buffer[i];
+                            cb.linelen++;
+                            if (cb.line[cb.linelen-1]=='\n' || cb.linelen==CB_LINELEN-1) {
+                                cb.line[cb.linelen]=0;
+                                sscanf((const char *)cb.line,"%d %d %d %d %d",
+                                       &cb.d0, &cb.d1, &cb.d2, &cb.d3, &cb.prox);
                                 [self.customDrawn setNeedsDisplay];
 #if 0
                                 NSString *output = [[NSString alloc] initWithBytes:line length:linelen+1 encoding:NSASCIIStringEncoding];
@@ -141,7 +158,7 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
                                     NSLog(@"server said: %@", output);
                                 }
 #endif
-                                linelen=0;
+                                cb.linelen=0;
                             }
                         }
                     }
@@ -150,9 +167,9 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
 //                NSData *data = [[NSData alloc] initWithData:[response dataUsingEncoding:NSASCIIStringEncoding]];
 //                [self.outputStream write:[data bytes] maxLength:[data length]];
 //                NSLog(@"sent hello");
-//                self.d0 = rand() % 200;
-//                self.d1 = rand() % 200;
-//                self.d2 = rand() % 200;
+//                self.d0 = rand() % CB_SENSOR_MAX_DISTANCE;
+//                self.d1 = rand() % CB_SENSOR_MAX_DISTANCE;
+//                self.d2 = rand() % CB_SENSOR_MAX_DISTANCE;
  //               self.d3 = rand() % 100;
                 //               [self.customDrawn setNeedsDisplay];
             }
@@ -161,7 +178,7 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
 		case NSStreamEventErrorOccurred:
         {
 			NSLog(@"Can not connect to the host!");
-            self.state = DISCONNECTED;
+            cb.cstate = DISCONNECTED;
             NSString *msg = [[NSString alloc] initWithFormat:@"FAILED to connect to %@:%@", self.serverAddr, self.serverPort];
             self.status.text = msg;
         }
@@ -170,7 +187,7 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
 		case NSStreamEventEndEncountered:
         {
             NSLog(@"Lost Connection host!");
-            self.state = DISCONNECTED;
+            cb.cstate = DISCONNECTED;
             NSString *msg = [[NSString alloc] initWithFormat:@"LOST connection to %@:%@", self.serverAddr, self.serverPort];
             self.status.text = msg;
 
@@ -186,42 +203,53 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
 }
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context {
+    CGPoint center;
+    center.x = layer.bounds.size.width / 2;
+    center.y = layer.bounds.size.height / 2;
     
-    CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
+     CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
     CGContextFillRect(context, layer.bounds);
     
     
     CGContextSaveGState(context);
-    CGContextSetFillColorWithColor(context, [UIColor greenColor].CGColor);
     
+    if (cb.prox & 1<<CB_FRONT_PROX_BIT) CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
+    else CGContextSetFillColorWithColor(context, [UIColor greenColor].CGColor);
     CGContextBeginPath(context);
-    CGContextMoveToPoint(context, 200, 200);
-    CGContextAddArc(context, 200, 200, d0, radians(255), radians(290), 0);
+    CGContextMoveToPoint(context, center.x, center.y);
+    CGContextAddArc(context, center.x, center.y, cb.d0, radians(255), radians(290), 0);
     CGContextClosePath(context);
     CGContextFillPath(context);
 
+    if (cb.prox & 1<<CB_RIGHT_PROX_BIT) CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
+    else CGContextSetFillColorWithColor(context, [UIColor orangeColor].CGColor);
     CGContextBeginPath(context);
-    CGContextMoveToPoint(context, 200, 200);
-    CGContextAddArc(context, 200, 200, d1, radians(345), radians(15), 0);
+    CGContextMoveToPoint(context, center.x, center.y);
+    CGContextAddArc(context, center.x, center.y, cb.d1, radians(345), radians(15), 0);
     CGContextClosePath(context);
     CGContextFillPath(context);
 
-
+    if (cb.prox & 1<<CB_BACK_PROX_BIT) CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
+    else CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
     CGContextBeginPath(context);
-    CGContextMoveToPoint(context, 200, 200);
-    CGContextAddArc(context, 200, 200, d2, radians(75), radians(105), 0);
+    CGContextMoveToPoint(context, center.x, center.y);
+    CGContextAddArc(context, center.x, center.y, cb.d2, radians(75), radians(105), 0);
     CGContextClosePath(context);
     CGContextFillPath(context);
 
+    if (cb.prox & 1<<CB_LEFT_PROX_BIT) CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
+    else CGContextSetFillColorWithColor(context, [UIColor blueColor].CGColor);
     CGContextBeginPath(context);
-    CGContextMoveToPoint(context, 200, 200);
-    CGContextAddArc(context, 200, 200, d3, radians(165), radians(195), 0);
+    CGContextMoveToPoint(context, center.x, center.y);
+    CGContextAddArc(context, center.x, center.y, cb.d3, radians(165), radians(195), 0);
     CGContextClosePath(context);
     CGContextFillPath(context);
     
     CGContextRestoreGState(context);
 }
 
+
+#if 0
 - (IBAction)ControlPan:(UIPanGestureRecognizer *)sender {
     if (self.state!=CONNECTED) return;
     NSLog(@"ControlPan: ");
@@ -270,4 +298,7 @@ enum {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10} speed=S0;
     NSLog(@"l:(%f,%f) t:(%f,%f) dir=%d\n", l.x, l.y, t.x, t.y, dir);
 
 }
+#endif
+
+
 @end
