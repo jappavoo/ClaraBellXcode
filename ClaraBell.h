@@ -39,6 +39,7 @@ struct ClaraBell {
     
     int     d0,d1,d2,d3,prox;
     enum CB_CONNECTION cstate;
+    int  volumeInit;
     enum CB_DIRECTION dir;
     enum CB_SPEED speed;
 };

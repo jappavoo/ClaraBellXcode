@@ -13,8 +13,9 @@
 
 @property (weak, nonatomic) IBOutlet UITextField *serverPortField;
 @property (weak, nonatomic) IBOutlet UITextField *serverAddrField;
-@property (weak, nonatomic) IBOutlet UIImageView *controlView;
 @property (weak, nonatomic) IBOutlet UILabel *status;
+@property (weak, nonatomic) IBOutlet UITextField *sayField;
+@property (weak, nonatomic) IBOutlet UISlider *volumeSlider;
 
 @property (nonatomic) CALayer *customDrawn;
 @property (nonatomic) MotorControlView *motorControlView;
@@ -24,8 +25,12 @@
 @property (weak, nonatomic) NSInputStream *inputStream;
 @property (weak, nonatomic) NSOutputStream *outputStream;
 
+@property (copy, nonatomic) NSString *sayString;
 
 - (IBAction)connect:(id)sender;
+- (IBAction)sayButton:(UIButton *)sender;
+- (IBAction)sayString:(UIButton *)sender;
+- (IBAction)setVolume:(UISlider *)sender;
 
 
 

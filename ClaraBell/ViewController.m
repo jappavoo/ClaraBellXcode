@@ -25,6 +25,7 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 
 @synthesize serverAddr = _serverAddr;
 @synthesize serverPort = _serverPort;
+@synthesize sayString = _sayString;
 @synthesize inputStream = _inputStream;
 @synthesize outputStream = _outputStream;
 @synthesize customDrawn = _customDrawn;
@@ -111,13 +112,15 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
             [self.outputStream open];
             self.motorControlView.motorOutputStream = self.outputStream;
             cb.cstate = CONNECTING;
-            NSLog(@"connecting");
+//            NSLog(@"connecting");
         }
     }
 }
 
+
 - (BOOL)textFieldShouldReturn:(UITextField *)theTextField {
-    if (theTextField == self.serverAddrField || theTextField == self.serverPortField) {
+    if (theTextField == self.serverAddrField || theTextField == self.serverPortField
+        || theTextField == self.sayField) {
         [theTextField resignFirstResponder];
     }
     return YES;
@@ -128,10 +131,12 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
             
 		case NSStreamEventOpenCompleted:
         {
-			NSLog(@"Stream opened");
-            cb.cstate = CONNECTED;
-            NSString *msg = [[NSString alloc] initWithFormat:@"connected to %@:%@", self.serverAddr, self.serverPort];
-            self.status.text = msg;
+//			NSLog(@"Stream opened");
+            if (theStream==self.outputStream) {
+              cb.cstate = CONNECTED;
+              NSString *msg = [[NSString alloc] initWithFormat:@"connected to %@:%@", self.serverAddr, self.serverPort];
+              self.status.text = msg;
+            }
 
         }
 			break;
@@ -155,7 +160,7 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
                                 NSString *output = [[NSString alloc] initWithBytes:line length:linelen+1 encoding:NSASCIIStringEncoding];
                                 
                                 if (nil != output) {
-                                    NSLog(@"server said: %@", output);
+//                                    NSLog(@"server said: %@", output);
                                 }
 #endif
                                 cb.linelen=0;
@@ -177,8 +182,9 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
             
 		case NSStreamEventErrorOccurred:
         {
-			NSLog(@"Can not connect to the host!");
+//			NSLog(@"Can not connect to the host!");
             cb.cstate = DISCONNECTED;
+            cb.volumeInit = 0;
             NSString *msg = [[NSString alloc] initWithFormat:@"FAILED to connect to %@:%@", self.serverAddr, self.serverPort];
             self.status.text = msg;
         }
@@ -186,8 +192,9 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
             
 		case NSStreamEventEndEncountered:
         {
-            NSLog(@"Lost Connection host!");
+//            NSLog(@"Lost Connection host!");
             cb.cstate = DISCONNECTED;
+            cb.volumeInit = 0;
             NSString *msg = [[NSString alloc] initWithFormat:@"LOST connection to %@:%@", self.serverAddr, self.serverPort];
             self.status.text = msg;
 
@@ -195,7 +202,11 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 			break;
     
         case NSStreamEventHasSpaceAvailable:
-            NSLog(@"Has Space");
+//            NSLog(@"Has Space");
+            if (cb.volumeInit==0) {
+               [self setVolume:self.volumeSlider];
+                cb.volumeInit=1;
+            }
             break;
 		default:
 			NSLog(@"Unknown event: %i", streamEvent);
@@ -260,7 +271,7 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
     
     switch (s) {
         case UIGestureRecognizerStateBegan:
-            NSLog(@"> Began:");
+//            NSLog(@"> Began:");
             dir=NONE; speed=S0;
 //              [self.outputStream write:(const uint8_t *)"M2g\n" maxLength:4];
             break;
@@ -288,17 +299,51 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
             break;
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateEnded:
-            NSLog(@"< Ended:");
+//            NSLog(@"< Ended:");
                 [self.outputStream write:(const uint8_t *)"MH\n" maxLength:3];
             dir=NONE; speed=S0;
             break;
         default:
             NSLog(@"state unknown %i: ",s);
     }
-    NSLog(@"l:(%f,%f) t:(%f,%f) dir=%d\n", l.x, l.y, t.x, t.y, dir);
+//    NSLog(@"l:(%f,%f) t:(%f,%f) dir=%d\n", l.x, l.y, t.x, t.y, dir);
 
 }
 #endif
+
+
+- (IBAction)sayButton:(UIButton *)sender {
+    
+    unichar c=[sender.titleLabel.text characterAtIndex:0];
+    uint8_t cmd[3]; cmd[0]='V'; cmd[1]=c;  cmd[2]='\n';
+    [self.outputStream write:cmd  maxLength:3];
+}
+
+- (IBAction)sayString:(UIButton *)sender {
+    self.sayString = self.sayField.text;
+    NSString *str = self.sayString;
+    if ([str length]==0) return;
+    
+    if (cb.cstate != CONNECTED) return;
+    
+    NSString *msg = [[NSString alloc] initWithFormat:@"V\"%@\n",
+                     str];
+    NSData *data = [msg dataUsingEncoding:NSASCIIStringEncoding];
+    
+    [self.outputStream write:data.bytes maxLength:data.length];
+//    NSLog(@"%@ len=%i",msg, data.length);
+
+}
+
+- (IBAction)setVolume:(UISlider *)sender {
+    if (cb.cstate != CONNECTED) return;
+    NSString *msg = [[NSString alloc]
+                        initWithFormat:@"Vv%f\n",sender.value];
+    NSData *data = [msg dataUsingEncoding:NSASCIIStringEncoding];
+    
+    [self.outputStream write:data.bytes maxLength:data.length];
+
+}
 
 
 @end

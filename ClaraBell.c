@@ -17,6 +17,7 @@ struct ClaraBell cb = {
     .linelen = 0, .mcmdlen = 0, .vcmdlen = 0, .scmdlen = 0,
     .d0 = 0, .d1 = 0, .d2 = 0, .d3 = 0, .prox = 0,
     .cstate = DISCONNECTED,
+    .volumeInit = 0,
     .dir = NONE,
     .speed = S0
 };

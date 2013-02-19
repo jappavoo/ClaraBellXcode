@@ -90,10 +90,10 @@ Boolean processLoc(CGPoint l, CGSize dim)
     }
    
     if (update) {
-    NSLog(@"l.x=%f l.y=%f dim.w=%f dim.h=%f yval=%i xval=%i dir=%i S10=%@"
-          " speed=%i speed=%@",
-          l.x, l.y, dim.width, dim.height, yval, xval,
-          dir, dirName(dir), speed, speedName(speed));
+//    NSLog(@"l.x=%f l.y=%f dim.w=%f dim.h=%f yval=%i xval=%i dir=%i S10=%@"
+//          " speed=%i speed=%@",
+//          l.x, l.y, dim.width, dim.height, yval, xval,
+//          dir, dirName(dir), speed, speedName(speed));
     }
     return update;
 }
@@ -102,7 +102,7 @@ Boolean processLoc(CGPoint l, CGSize dim)
 {
     CGPoint p;
     Boolean inView;
-    NSLog(@"touchesBegan");
+//    NSLog(@"touchesBegan");
 
     for (UITouch *touch in touches) {
         p = [touch locationInView:self];
@@ -133,7 +133,7 @@ Boolean processLoc(CGPoint l, CGSize dim)
 {
     CGPoint p;
     Boolean inView;
-    NSLog(@"touchesEnded");
+//    NSLog(@"touchesEnded");
     for (UITouch *touch in touches) {
         p = [touch locationInView:self];
         inView = [self pointInside:p withEvent:event];
@@ -145,7 +145,7 @@ Boolean processLoc(CGPoint l, CGSize dim)
 
 -(void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"touchesCancelled");
+//    NSLog(@"touchesCancelled");
     [self touchesEnded:touches withEvent:event];
 }
 
