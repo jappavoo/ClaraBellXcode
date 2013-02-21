@@ -29,6 +29,8 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 @synthesize inputStream = _inputStream;
 @synthesize outputStream = _outputStream;
 @synthesize customDrawn = _customDrawn;
+@synthesize sayList = _sayList;
+@synthesize sayListCursor = _sayListCursor;
 
 
 - (void)viewDidLoad
@@ -39,8 +41,17 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
     cb.d2 = CB_SENSOR_MAX_DISTANCE;
     cb.d3 = CB_SENSOR_MAX_DISTANCE;
     cb.prox = 0;
+    
 
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    self.sayListCursor=0;
+    self.sayList = [[NSMutableArray alloc] initWithCapacity:20];
+    [self.sayList insertObject:@"What are you doing?" atIndex:0];
+    [self.sayList insertObject:@"I am tired." atIndex:1];
+ //   for (int i=0; i<self.sayList.count; i++) NSLog(@"SayList[%i]=%@", i, [self.sayList objectAtIndex:i]);
+    self.sayField.text = [self.sayList objectAtIndex:self.sayListCursor];
+    
     self.customDrawn = [CALayer layer];
     self.customDrawn.delegate = self;
     self.customDrawn.backgroundColor = [UIColor greenColor].CGColor;
@@ -343,6 +354,80 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
     
     [self.outputStream write:data.bytes maxLength:data.length];
 
+}
+
+- (IBAction)clearSayField:(UIButton *)sender {
+     if (self.sayListCursor!=-1 && self.sayListCursor!=self.sayList.count) {
+         NSUInteger cursor = self.sayListCursor;
+         [self upSayField:sender];
+         [self.sayList removeObjectAtIndex:cursor];
+    }
+    self.sayField.text = nil;
+}
+
+- (IBAction)upSayField:(UIButton *)sender {
+//   NSLog(@"up:start: %i %i",self.sayListCursor, self.sayList.count);
+    
+    if (self.sayField.text==nil) {
+        if (self.sayListCursor==self.sayList.count) {
+            self.sayListCursor=self.sayList.count-1;
+        } 
+    } else {
+      NSString *str = [[NSString alloc] initWithString:self.sayField.text];
+      if (self.sayListCursor==self.sayList.count || self.sayListCursor==-1) {
+          if ([str length]==0) return;
+          if (self.sayListCursor==-1) {
+              [self.sayList insertObject:str atIndex:0];
+              self.sayListCursor=0;
+          } else {
+              [self.sayList insertObject:str atIndex:self.sayList.count];
+              self.sayListCursor--;
+          }
+      } else {
+          self.sayListCursor--;
+      }
+    }
+    if (self.sayListCursor==self.sayList.count || self.sayListCursor==-1) {
+        self.sayField.text=nil;
+    } else {
+        self.sayField.text = [self.sayList objectAtIndex:self.sayListCursor];
+    }
+    
+//    NSLog(@"up:start: %i %i",self.sayListCursor, self.sayList.count);
+//    for (int i=0; i<self.sayList.count; i++) NSLog(@"SayList[%i]=%@", i, [self.sayList objectAtIndex:i]);
+}
+
+- (IBAction)downSayField:(UIButton *)sender {
+//    NSLog(@"down:start: %i %i",self.sayListCursor, self.sayList.count);
+
+    if (self.sayField.text==nil) {
+        if (self.sayListCursor==-1) {
+            self.sayListCursor=0;
+        }
+    } else {
+        if (self.sayListCursor==self.sayList.count || self.sayListCursor==-1) {
+          NSString *str = [[NSString alloc] initWithString:self.sayField.text];
+          if ([str length]==0) return;
+            if (self.sayListCursor==-1) {
+                [self.sayList insertObject:str atIndex:0];
+                self.sayListCursor=0;
+            } else {
+                [self.sayList insertObject:str atIndex:self.sayList.count];
+                self.sayListCursor--;
+            }
+        } else {
+            self.sayListCursor++;
+        }
+    }
+    
+    if (self.sayListCursor==self.sayList.count || self.sayListCursor==-1) {
+        self.sayField.text = nil;
+    } else {
+        self.sayField.text = [self.sayList objectAtIndex:self.sayListCursor];
+    }
+
+//    NSLog(@"down:end: %i %i",self.sayListCursor, self.sayList.count);
+//    for (int i=0; i<self.sayList.count; i++) NSLog(@"SayList[%i]=%@", i, [self.sayList objectAtIndex:i]);
 }
 
 

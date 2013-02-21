@@ -26,12 +26,17 @@
 @property (weak, nonatomic) NSOutputStream *outputStream;
 
 @property (copy, nonatomic) NSString *sayString;
+@property (nonatomic) NSMutableArray *sayList;
+@property (nonatomic) NSUInteger sayListCursor;
 
 - (IBAction)connect:(id)sender;
 - (IBAction)sayButton:(UIButton *)sender;
 - (IBAction)sayString:(UIButton *)sender;
 - (IBAction)setVolume:(UISlider *)sender;
 
+- (IBAction)clearSayField:(UIButton *)sender;
+- (IBAction)upSayField:(UIButton *)sender;
+- (IBAction)downSayField:(UIButton *)sender;
 
 
 @end
