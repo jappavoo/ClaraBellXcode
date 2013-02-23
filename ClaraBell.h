@@ -19,9 +19,11 @@
 #define CB_LEFT_PROX_BIT  2
 #define CB_BACK_PROX_BIT  3
 
-enum CB_CONNECTION { DISCONNECTED=0, CONNECTING, CONNECTED};
-enum CB_DIRECTION {NONE=0, FORWARD, BACKWARD, LEFT, RIGHT};
-enum CB_SPEED {S0=0, S1=1, S2=2, S3=3, S4=4, S5=5, S6=6, S7=7, S8=8, S9=9, S10=10};
+enum CB_CONNECTION   { DISCONNECTED=0, CONNECTING, CONNECTED };
+enum CB_DIRECTION    { DIR_NONE=-1, FORWARD='F', BACKWARD='B', LEFT='L', RIGHT='R' };
+enum CB_MOTION_TYPE  { BEGIN='B', CHANGE='C', END='E' };
+enum CB_SPEED        { SNONE=-1, S0=0, S1=1, S2=2, S3=3, S4=4, S5=5, S6=6, S7=7, S8=8, S9=9};
+enum CB_SPEED_OFFSET { SOFFNONE=-1, SOFF0=0, SOFF1=1, SOFF2=2, SOFF3=3, SOFF4=4 };
 
 extern char *DIRCMDS[5];
 extern char *SPEEDCMDS[11];
@@ -38,55 +40,14 @@ struct ClaraBell {
     int     scmdlen;
     
     int     d0,d1,d2,d3,prox;
+    int     lencoder, rencoder;
     enum CB_CONNECTION cstate;
     int  volumeInit;
-    enum CB_DIRECTION dir;
-    enum CB_SPEED speed;
+    enum CB_DIRECTION last_dir;
+    enum CB_SPEED last_speed;
+    enum CB_SPEED_OFFSET last_offset;
 };
 
 extern struct ClaraBell cb;
-
-
-static inline void
-cb_reset_mcmd()
-{
-    cb.mcmd[0]='M';
-    cb.mcmdlen=1;
-}
-
-static inline void
-cb_mcmd_set_symetric_speed(enum CB_SPEED s)
-{
-}
-
-static inline void
-cb_mcmd_set_rotational_direction(enum CB_DIRECTION d)
-{
-}
-
-static inline int
-cb_mcmd_close(void)
-{
-    if (cb.mcmdlen >= CB_CMDLEN) return -1;
-    if (cb.mcmd[0]!='M') return -1;
-    cb.mcmd[cb.mcmdlen]='\n';
-    cb.mcmdlen++;
-    return 0;
-}
-
-
-static inline void
-cb_reset_scmd()
-{
-    cb.scmd[1]='S';
-    cb.scmdlen=1;
-}
-
-static inline void
-cb_reset_vcmd()
-{
-    cb.vcmd[0]='V';
-    cb.vcmdlen=1;
-}
 
 #endif

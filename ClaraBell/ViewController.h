@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <QuartzCore/QuartzCore.h>
 #import "MotorControlView.h"
 
 @interface ViewController : UIViewController <UITextFieldDelegate,NSStreamDelegate>
@@ -18,6 +19,8 @@
 @property (weak, nonatomic) IBOutlet UISlider *volumeSlider;
 
 @property (nonatomic) CALayer *customDrawn;
+@property (nonatomic) CATextLayer *leftWheelEncoderLabel;
+@property (nonatomic) CATextLayer *rightWheelEncoderLabel;
 @property (nonatomic) MotorControlView *motorControlView;
 
 @property (copy, nonatomic) NSString *serverAddr;

@@ -12,7 +12,7 @@
 #include "ClaraBell.h"
 
 #define CUSTOM_DRAW_BORDER 8
-#define CUSTOM_DRAW_ORIGIN_X 5
+#define CUSTOM_DRAW_ORIGIN_X 50
 #define CUSTOM_DRAW_ORIGIN_Y 20
 
 static inline double radians (double degrees) { return degrees * M_PI/180; }
@@ -29,6 +29,7 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 @synthesize inputStream = _inputStream;
 @synthesize outputStream = _outputStream;
 @synthesize customDrawn = _customDrawn;
+@synthesize leftWheelEncoderLabel = _leftWheelEncoderLabel;
 @synthesize sayList = _sayList;
 @synthesize sayListCursor = _sayListCursor;
 
@@ -69,6 +70,25 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 
     [self.view.layer addSublayer:self.customDrawn];
 
+    self.leftWheelEncoderLabel = [[CATextLayer alloc] init];
+    self.leftWheelEncoderLabel.font=(__bridge CFTypeRef)(@"System");
+    self.leftWheelEncoderLabel.fontSize=17;
+    self.leftWheelEncoderLabel.frame = CGRectMake(5,0,100, 20);
+    self.leftWheelEncoderLabel.string=[NSString stringWithFormat:@"%010d",cb.lencoder];
+    self.leftWheelEncoderLabel.alignmentMode=kCAAlignmentLeft;
+    self.leftWheelEncoderLabel.foregroundColor=[[UIColor blueColor] CGColor];
+    [self.customDrawn addSublayer:self.leftWheelEncoderLabel];
+
+    self.rightWheelEncoderLabel = [[CATextLayer alloc] init];
+    self.rightWheelEncoderLabel.font=(__bridge CFTypeRef)(@"System");
+    self.rightWheelEncoderLabel.fontSize=17;
+    self.rightWheelEncoderLabel.frame = CGRectMake(305,0,100, 20);
+    self.rightWheelEncoderLabel.string=[NSString stringWithFormat:@"%010d",cb.rencoder];
+    self.rightWheelEncoderLabel.alignmentMode=kCAAlignmentRight;
+    self.rightWheelEncoderLabel.foregroundColor=[[UIColor orangeColor] CGColor];
+    [self.customDrawn addSublayer:self.rightWheelEncoderLabel];
+
+    
     CGRect  viewRect = CGRectMake(493, 20, 525, 700);
     self.motorControlView = [[MotorControlView alloc] initWithFrame:viewRect];
     NSString *imgFilepath = [[NSBundle mainBundle] pathForResource:@"motiongrid" ofType:@"png"];
@@ -147,6 +167,10 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
               cb.cstate = CONNECTED;
               NSString *msg = [[NSString alloc] initWithFormat:@"connected to %@:%@", self.serverAddr, self.serverPort];
               self.status.text = msg;
+              cb.lencoder++;
+              self.leftWheelEncoderLabel.string=[NSString stringWithFormat:@"%010d",cb.lencoder];
+                cb.rencoder--;
+                self.rightWheelEncoderLabel.string=[NSString stringWithFormat:@"%010d",cb.rencoder];
             }
 
         }
@@ -167,13 +191,6 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
                                 sscanf((const char *)cb.line,"%d %d %d %d %d",
                                        &cb.d0, &cb.d1, &cb.d2, &cb.d3, &cb.prox);
                                 [self.customDrawn setNeedsDisplay];
-#if 0
-                                NSString *output = [[NSString alloc] initWithBytes:line length:linelen+1 encoding:NSASCIIStringEncoding];
-                                
-                                if (nil != output) {
-//                                    NSLog(@"server said: %@", output);
-                                }
-#endif
                                 cb.linelen=0;
                             }
                         }
@@ -324,7 +341,7 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 
 
 - (IBAction)sayButton:(UIButton *)sender {
-    
+    if (cb.cstate != CONNECTED) return;
     unichar c=[sender.titleLabel.text characterAtIndex:0];
     uint8_t cmd[3]; cmd[0]='V'; cmd[1]=c;  cmd[2]='\n';
     [self.outputStream write:cmd  maxLength:3];
