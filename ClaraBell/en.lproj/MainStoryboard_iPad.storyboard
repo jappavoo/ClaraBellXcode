@@ -349,28 +349,6 @@
     <resources>
         <image name="icon.png" width="114" height="114"/>
     </resources>
-    <classes>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-        <class className="ViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="clearSayField:" candidateClass="UIButton"/>
-                <relationship kind="action" name="connect:"/>
-                <relationship kind="action" name="downSayField:" candidateClass="UIButton"/>
-                <relationship kind="action" name="sayButton:" candidateClass="UIButton"/>
-                <relationship kind="action" name="sayString:" candidateClass="UIButton"/>
-                <relationship kind="action" name="setVolume:" candidateClass="UISlider"/>
-                <relationship kind="action" name="upSayField:" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="sayField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="serverAddrField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="serverPortField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="status" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="volumeSlider" candidateClass="UISlider"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

@@ -13,6 +13,7 @@
 #define XDIV 3
 #define XOFFDIV 15
 
+#define POLAR
 
 @implementation MotorControlView
 
@@ -43,7 +44,7 @@ NSString *dirName(enum CB_DIRECTION d)
 NSString *speedName(enum CB_SPEED s)
 {
     switch (s) {
-        case SNONE: return @"NONE";
+        case SPEED_NONE: return @"NONE";
         case S0: return @"S0";
         case S1: return @"S1";
         case S2: return @"S2";
@@ -61,7 +62,7 @@ NSString *speedName(enum CB_SPEED s)
 NSString *speedOffName(enum CB_SPEED_OFFSET o)
 {
     switch(o) {
-        case SOFFNONE: return @"SOFFNONE";
+        case SPEED_OFF_NONE: return @"SOFFNONE";
         case SOFF0: return @"SOFF0";
         case SOFF1: return @"SOFF1";
         case SOFF2: return @"SOFF2";
@@ -69,6 +70,41 @@ NSString *speedOffName(enum CB_SPEED_OFFSET o)
         case SOFF4: return @"SOFF4";
     }
     return @"unknown Speed Offset";
+}
+
+void
+pointToPolar(CGPoint l, CGSize dim, CGFloat *degress, CGFloat *distance)
+{
+    CGFloat cx=dim.width/2.0;
+    CGFloat cy=dim.height/2.0;
+    CGFloat dx = l.x - cx;
+    CGFloat dy = l.y - cy;
+    
+    CGFloat rads=atan2f(dx,dy);
+    CGFloat degs= rads * (180.0 / M_PI);           // convert to degrees
+    degs = (degs > 0.0 ? degs : (360.0 + degs)); // correct discontinuity
+    degs += 11.25;
+    if (degs > 360.0) degs-=360.0;
+    CGFloat xsqr = dx * dx;
+    CGFloat ysqr = dy * dy;
+    CGFloat dis = sqrtf(xsqr+ysqr)/(dim.height/2.0); // distance as a faction of the radius
+    *degress = degs; *distance = dis;
+}
+
+NSData *
+polarToCBPolarCmd(CGFloat deg, CGFloat dis)
+{
+    enum CB_SPEED s; enum CB_POLAR_DIVISION d;
+    s =  (int)9.0 * pow(dis,1.5);
+    d =  (int)deg/(360.0 /(CGFloat)CB_POLAR_DIVSIONS);
+    if (s != cb.last_speed || d != cb.last_div ) {
+        NSString *msg=[NSString stringWithFormat:@"MP%u,%u\n", s,d];
+        //      NSLog(@"%@",msg);
+        cb.last_speed = s; cb.last_div = d;
+        return [msg dataUsingEncoding:NSASCIIStringEncoding];
+        
+    }
+    return nil;
 }
 
 NSData *processLoc(enum CB_MOTION_TYPE t, CGPoint l, CGSize dim)
@@ -129,8 +165,16 @@ NSData *processLoc(enum CB_MOTION_TYPE t, CGPoint l, CGSize dim)
         p = [touch locationInView:self];
         inView = [self pointInside:p withEvent:event];
         if (cb.cstate == CONNECTED && inView) {
-            cb.last_dir = DIR_NONE; cb.last_speed = SNONE; cb.last_offset = SOFFNONE;
+#ifdef POLAR
+            CGFloat degs, dis;
+            cb.last_speed=SPEED_NONE; cb.last_div = DIV_NONE;
+            pointToPolar(p,self.bounds.size, &degs, &dis);
+            NSData *data=polarToCBPolarCmd(degs, dis);
+//            NSLog(@"Begin: theta=%f len=%f %@", degs, dis, data);
+#else
+            cb.last_dir = DIR_NONE; cb.last_speed = SPEED_NONE; cb.last_offset = SOFFNONE;
             NSData *data=processLoc(BEGIN, p, self.bounds.size);
+#endif
             if (data!=nil) [self.motorOutputStream write:data.bytes maxLength:data.length];
         }
     }
@@ -146,7 +190,14 @@ NSData *processLoc(enum CB_MOTION_TYPE t, CGPoint l, CGSize dim)
         p = [touch locationInView:self];
         inView = [self pointInside:p withEvent:event];
         if (cb.cstate == CONNECTED && inView) {
+#ifdef POLAR
+            CGFloat degs, dis;
+            pointToPolar(p,self.bounds.size, &degs, &dis);
+            NSData *data=polarToCBPolarCmd(degs, dis);
+//            NSLog(@"Move: theta=%f len=%f %@", degs, dis, data);
+#else
             NSData *data=processLoc(CHANGE, p, self.bounds.size);
+#endif
             if (data!=nil) [self.motorOutputStream write:data.bytes maxLength:data.length];
         }
     }
@@ -162,8 +213,11 @@ NSData *processLoc(enum CB_MOTION_TYPE t, CGPoint l, CGSize dim)
         inView = [self pointInside:p withEvent:event];
         
         if (cb.cstate==CONNECTED) [self.motorOutputStream write:(const uint8_t *)"ME\n" maxLength:3];
+#ifdef POLAR
+#else
         cb.last_dir=DIR_NONE; cb.last_speed=SNONE; cb.last_offset = SOFFNONE;
-//        NSLog(@"ME");
+#endif
+        NSLog(@"ME");
     }
 }
 

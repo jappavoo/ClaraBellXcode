@@ -89,9 +89,9 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
     [self.customDrawn addSublayer:self.rightWheelEncoderLabel];
 
     
-    CGRect  viewRect = CGRectMake(493, 20, 525, 700);
+    CGRect  viewRect = CGRectMake(480, 100, 529, 529);
     self.motorControlView = [[MotorControlView alloc] initWithFrame:viewRect];
-    NSString *imgFilepath = [[NSBundle mainBundle] pathForResource:@"motiongrid" ofType:@"png"];
+    NSString *imgFilepath = [[NSBundle mainBundle] pathForResource:@"motionspectrum" ofType:@"png"];
     UIImage *img = [[UIImage alloc] initWithContentsOfFile:imgFilepath];
     [self.motorControlView setImage:img];
     
