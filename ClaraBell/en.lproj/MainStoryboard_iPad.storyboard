@@ -49,11 +49,11 @@
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="icon.png" translatesAutoresizingMaskIntoConstraints="NO" id="VO0-1U-svr">
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="240" id="kZf-6v-Kg4"/>
-                                    <constraint firstAttribute="width" constant="320" id="ovP-L8-eGD"/>
-                                </constraints>
+                            <imageView contentMode="scaleToFill" image="cb_default.jpg" translatesAutoresizingMaskIntoConstraints="NO" id="VO0-1U-svr">
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="DJ8-VF-RrX" appends="YES" id="5rC-0L-pzU"/>
+                                </connections>
                             </imageView>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="8000" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Z7z-ou-ytg">
                                 <constraints>
@@ -334,6 +334,7 @@
                     </view>
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
+                        <outlet property="cameraImage" destination="VO0-1U-svr" id="MEH-fX-67K"/>
                         <outlet property="sayField" destination="39O-fc-0fS" id="rvY-eM-k0J"/>
                         <outlet property="serverAddrField" destination="C2Q-bk-fbZ" id="zTM-cI-98N"/>
                         <outlet property="serverPortField" destination="Z7z-ou-ytg" id="9yi-uA-UgW"/>
@@ -342,13 +343,42 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="DJ8-VF-RrX">
+                    <connections>
+                        <action selector="cameraTap:" destination="2" id="4lu-5u-6O9"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="33" y="-4"/>
         </scene>
     </scenes>
     <resources>
-        <image name="icon.png" width="114" height="114"/>
+        <image name="cb_default.jpg" width="320" height="240"/>
     </resources>
+    <classes>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+        <class className="ViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="cameraTap:" candidateClass="UITapGestureRecognizer"/>
+                <relationship kind="action" name="clearSayField:" candidateClass="UIButton"/>
+                <relationship kind="action" name="connect:"/>
+                <relationship kind="action" name="downSayField:" candidateClass="UIButton"/>
+                <relationship kind="action" name="sayButton:" candidateClass="UIButton"/>
+                <relationship kind="action" name="sayString:" candidateClass="UIButton"/>
+                <relationship kind="action" name="setVolume:" candidateClass="UISlider"/>
+                <relationship kind="action" name="upSayField:" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="cameraImage" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="sayField" candidateClass="UITextField"/>
+                <relationship kind="outlet" name="serverAddrField" candidateClass="UITextField"/>
+                <relationship kind="outlet" name="serverPortField" candidateClass="UITextField"/>
+                <relationship kind="outlet" name="status" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="volumeSlider" candidateClass="UISlider"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

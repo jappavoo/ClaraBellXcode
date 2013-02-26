@@ -28,7 +28,9 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 @synthesize sayString = _sayString;
 @synthesize inputStream = _inputStream;
 @synthesize outputStream = _outputStream;
+@synthesize imageStream = _imageStream;
 @synthesize customDrawn = _customDrawn;
+@synthesize cameraImage = _cameraImage;
 @synthesize leftWheelEncoderLabel = _leftWheelEncoderLabel;
 @synthesize sayList = _sayList;
 @synthesize sayListCursor = _sayListCursor;
@@ -128,19 +130,28 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 
         CFReadStreamRef readStream;
         CFWriteStreamRef writeStream;
+        CFReadStreamRef  imageStream;
+        
         NSScanner* scan = [NSScanner scannerWithString:portString];
         int port;
         if ([scan scanInt:&port]) {
             CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)addrString,
                                                port, &readStream, &writeStream);
+            CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)addrString,
+                                               port+1, &imageStream, NULL);
+
             self.inputStream = (__bridge NSInputStream *)(readStream);
             self.outputStream = (__bridge NSOutputStream *)writeStream;
+            self.imageStream = (__bridge NSInputStream *)imageStream;
             [self.inputStream setDelegate:self];
             [self.outputStream setDelegate:self];
+            [self.imageStream setDelegate:self];
             [self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
             [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+            [self.imageStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
             [self.inputStream open];
             [self.outputStream open];
+            [self.imageStream open];
             self.motorControlView.motorOutputStream = self.outputStream;
             cb.cstate = CONNECTING;
 //            NSLog(@"connecting");
@@ -196,6 +207,40 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
                         }
                     }
                 }
+                while ([self.imageStream hasBytesAvailable]) {
+//                    NSLog(@"image coming in cb.imagelenbytes=%d cb.imagebytes=%d cb.imagelen=%d sizeof(imagelen)%ld", cb.imagelenbytes, cb.imagebytes,
+  //                        cb.imagelen, sizeof(cb.imagelen));
+                    if (cb.imagelenbytes!=sizeof(cb.imagelen)) {
+                        len = [self.imageStream read:(uint8_t *)&(cb.image[cb.imagebytes]) maxLength:(sizeof(cb.imagelen)-cb.imagebytes)];
+//                        NSLog(@"len coming in len=%d cb.imagebytes=%d cb.imagelen=%d", len, cb.imagebytes,
+ //                             cb.imagelen);
+                        if (len) {
+                            cb.imagelenbytes+=len;
+                            cb.imagelen=*((int *)cb.image);
+                            cb.imagebytes=0;
+                        }
+                    } else {
+                        cb.imagebytes += [self.imageStream read:(uint8_t *)&cb.image[cb.imagebytes] maxLength:cb.imagelen - cb.imagebytes ];
+//                        NSLog(@"body coming in cb.imagebytes=%d cb.imagelen=%d", cb.imagebytes,
+ //                             cb.imagelen);
+                        if (cb.imagelen == cb.imagebytes) {
+                            NSData *idata = [NSData dataWithBytesNoCopy:cb.image  length:cb.imagelen freeWhenDone:NO];
+ //                           NSLog(@"got image");
+                        // got a complete image display it and reset state
+                            UIImage *img = [[UIImage alloc] initWithData:idata];
+                            if (img) {
+                                self.cameraImage.image = img;
+                           //     NSLog(@"Image loaded to view");
+                              [self.cameraImage setNeedsDisplay];
+                            }
+                            cb.imagelen=0;
+                            cb.imagelenbytes=0;
+                            cb.imagebytes=0;
+                        }
+                            
+                    }
+                    
+                }
 //                NSString *response  = [NSString stringWithFormat:@"hello\n"];
 //                NSData *data = [[NSData alloc] initWithData:[response dataUsingEncoding:NSASCIIStringEncoding]];
 //                [self.outputStream write:[data bytes] maxLength:[data length]];
@@ -243,6 +288,7 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context {
     CGPoint center;
+    CGColorRef c;
     center.x = layer.bounds.size.width / 2;
     center.y = layer.bounds.size.height / 2;
     
@@ -252,32 +298,44 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
     
     CGContextSaveGState(context);
     
-    if (cb.prox & 1<<CB_FRONT_PROX_BIT) CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
-    else CGContextSetFillColorWithColor(context, [UIColor greenColor].CGColor);
+    c = [UIColor greenColor].CGColor;
+    if (cb.prox & 1<<(4+CB_FRONT_PROX_BIT)) c=[UIColor whiteColor].CGColor;
+    if (cb.prox & 1<<CB_FRONT_PROX_BIT) c=[UIColor yellowColor].CGColor;
+
+    CGContextSetFillColorWithColor(context, c);
     CGContextBeginPath(context);
     CGContextMoveToPoint(context, center.x, center.y);
     CGContextAddArc(context, center.x, center.y, cb.d0, radians(255), radians(290), 0);
     CGContextClosePath(context);
     CGContextFillPath(context);
 
-    if (cb.prox & 1<<CB_RIGHT_PROX_BIT) CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
-    else CGContextSetFillColorWithColor(context, [UIColor orangeColor].CGColor);
+    c = [UIColor orangeColor].CGColor;
+    if (cb.prox & 1<<(4+CB_RIGHT_PROX_BIT)) c=[UIColor whiteColor].CGColor;
+    if (cb.prox & 1<<CB_RIGHT_PROX_BIT) c=[UIColor yellowColor].CGColor;
+    
+    CGContextSetFillColorWithColor(context, c);
     CGContextBeginPath(context);
     CGContextMoveToPoint(context, center.x, center.y);
     CGContextAddArc(context, center.x, center.y, cb.d1, radians(345), radians(15), 0);
     CGContextClosePath(context);
     CGContextFillPath(context);
 
-    if (cb.prox & 1<<CB_BACK_PROX_BIT) CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
-    else CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
+    c = [UIColor redColor].CGColor;
+    if (cb.prox & 1<<(4+CB_BACK_PROX_BIT)) c=[UIColor whiteColor].CGColor;
+    if (cb.prox & 1<<CB_BACK_PROX_BIT) c=[UIColor yellowColor].CGColor;
+    
+    CGContextSetFillColorWithColor(context, c);
     CGContextBeginPath(context);
     CGContextMoveToPoint(context, center.x, center.y);
     CGContextAddArc(context, center.x, center.y, cb.d2, radians(75), radians(105), 0);
     CGContextClosePath(context);
     CGContextFillPath(context);
 
-    if (cb.prox & 1<<CB_LEFT_PROX_BIT) CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
-    else CGContextSetFillColorWithColor(context, [UIColor blueColor].CGColor);
+    c = [UIColor blueColor].CGColor;
+    if (cb.prox & 1<<(4+CB_LEFT_PROX_BIT)) c=[UIColor whiteColor].CGColor;
+    if (cb.prox & 1<<CB_LEFT_PROX_BIT) c=[UIColor yellowColor].CGColor;
+ 
+    CGContextSetFillColorWithColor(context, c);
     CGContextBeginPath(context);
     CGContextMoveToPoint(context, center.x, center.y);
     CGContextAddArc(context, center.x, center.y, cb.d3, radians(165), radians(195), 0);
@@ -445,6 +503,13 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 
 //    NSLog(@"down:end: %i %i",self.sayListCursor, self.sayList.count);
 //    for (int i=0; i<self.sayList.count; i++) NSLog(@"SayList[%i]=%@", i, [self.sayList objectAtIndex:i]);
+}
+
+- (IBAction)cameraTap:(UITapGestureRecognizer *)sender {
+//    NSLog(@"tap occured");
+    if (cb.cstate==CONNECTED) {
+         [self.outputStream write:(const uint8_t *)"ST\n" maxLength:3];
+    }
 }
 
 

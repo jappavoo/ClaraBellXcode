@@ -17,6 +17,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *status;
 @property (weak, nonatomic) IBOutlet UITextField *sayField;
 @property (weak, nonatomic) IBOutlet UISlider *volumeSlider;
+@property (weak, nonatomic) IBOutlet UIImageView *cameraImage;
 
 @property (nonatomic) CALayer *customDrawn;
 @property (nonatomic) CATextLayer *leftWheelEncoderLabel;
@@ -27,6 +28,7 @@
 @property (copy, nonatomic) NSString *serverPort;
 @property (weak, nonatomic) NSInputStream *inputStream;
 @property (weak, nonatomic) NSOutputStream *outputStream;
+@property (weak, nonatomic) NSInputStream *imageStream;
 
 @property (copy, nonatomic) NSString *sayString;
 @property (nonatomic) NSMutableArray *sayList;
@@ -41,5 +43,6 @@
 - (IBAction)upSayField:(UIButton *)sender;
 - (IBAction)downSayField:(UIButton *)sender;
 
+- (IBAction)cameraTap:(UITapGestureRecognizer *)sender;
 
 @end

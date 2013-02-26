@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		AB270BB316D8868C0035362D /* motionspectrum.png in Resources */ = {isa = PBXBuildFile; fileRef = AB270BB216D8868C0035362D /* motionspectrum.png */; };
+		AB270BB516DBA9690035362D /* cb_default.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB270BB416DBA9690035362D /* cb_default.jpg */; };
 		AB325C8F16CC071B00653AD3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB325C8E16CC071B00653AD3 /* UIKit.framework */; };
 		AB325C9116CC071B00653AD3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB325C9016CC071B00653AD3 /* Foundation.framework */; };
 		AB325C9316CC071B00653AD3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB325C9216CC071B00653AD3 /* CoreGraphics.framework */; };
@@ -49,6 +50,7 @@
 
 /* Begin PBXFileReference section */
 		AB270BB216D8868C0035362D /* motionspectrum.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = motionspectrum.png; sourceTree = SOURCE_ROOT; };
+		AB270BB416DBA9690035362D /* cb_default.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = cb_default.jpg; sourceTree = SOURCE_ROOT; };
 		AB325C8A16CC071B00653AD3 /* ClaraBell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClaraBell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB325C8E16CC071B00653AD3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		AB325C9016CC071B00653AD3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -163,6 +165,7 @@
 				AB325CAD16CC071B00653AD3 /* ViewController.m */,
 				AB922F4D16D19B5E00845E85 /* MotorControlView.h */,
 				AB922F4E16D19B5E00845E85 /* MotorControlView.m */,
+				AB270BB416DBA9690035362D /* cb_default.jpg */,
 				AB325C9516CC071B00653AD3 /* Supporting Files */,
 			);
 			path = ClaraBell;
@@ -286,6 +289,7 @@
 				AB922F4816CF254300845E85 /* target.png in Resources */,
 				AB922F4A16D05C8B00845E85 /* motiongrid.png in Resources */,
 				AB270BB316D8868C0035362D /* motionspectrum.png in Resources */,
+				AB270BB516DBA9690035362D /* cb_default.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

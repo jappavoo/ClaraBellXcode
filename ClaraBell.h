@@ -13,6 +13,7 @@
 
 #define CB_LINELEN 4096
 #define CB_CMDLEN  4096
+#define CB_MAX_IMAGE_BYTES (200 * 2024)
 
 #define CB_RIGHT_PROX_BIT 0
 #define CB_FRONT_PROX_BIT 1
@@ -32,10 +33,15 @@ extern char *DIRCMDS[5];
 extern char *SPEEDCMDS[11];
 
 struct ClaraBell {
+    char image[CB_MAX_IMAGE_BYTES];
     char line[CB_LINELEN];
     char mcmd[CB_CMDLEN];
     char vcmd[CB_CMDLEN];
     char scmd[CB_CMDLEN];
+    
+    int     imagelenbytes;
+    int     imagelen;
+    int     imagebytes;
     
     int     linelen;
     int     mcmdlen;
