@@ -183,63 +183,79 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
                 cb.rencoder--;
                 self.rightWheelEncoderLabel.string=[NSString stringWithFormat:@"%010d",cb.rencoder];
             }
+            if (theStream==self.imageStream) {
+                cb.imagelen=0;
+                cb.imagebytes=0;
+                cb.imagelenbytes=0;
+                [self.outputStream write:(const uint8_t *)"ST\n" maxLength:3];
+                cb.imageInit=1;
+            }
 
         }
 			break;
 		case NSStreamEventHasBytesAvailable:
             {
-                uint8_t buffer[1024];
-                int len,i;
+                if (theStream==self.inputStream) {
+                  uint8_t buffer[1024];
+                  int len,i;
                 
-                while ([self.inputStream hasBytesAvailable]) {
-                    len = [self.inputStream read:buffer maxLength:sizeof(buffer)];
-                    if (len > 0) {
-                        for (i=0; i<len; i++) {
-                            cb.line[cb.linelen]=buffer[i];
-                            cb.linelen++;
-                            if (cb.line[cb.linelen-1]=='\n' || cb.linelen==CB_LINELEN-1) {
-                                cb.line[cb.linelen]=0;
-                                sscanf((const char *)cb.line,"%d %d %d %d %d",
-                                       &cb.d0, &cb.d1, &cb.d2, &cb.d3, &cb.prox);
-                                [self.customDrawn setNeedsDisplay];
-                                cb.linelen=0;
-                            }
-                        }
-                    }
+                  while ([self.inputStream hasBytesAvailable]) {
+                      len = [self.inputStream read:buffer maxLength:sizeof(buffer)];
+                      if (len > 0) {
+                          for (i=0; i<len; i++) {
+                              cb.line[cb.linelen]=buffer[i];
+                              cb.linelen++;
+                              if (cb.line[cb.linelen-1]=='\n' || cb.linelen==CB_LINELEN-1) {
+                                  cb.line[cb.linelen]=0;
+                                  sscanf((const char *)cb.line,"%d %d %d %d %d",
+                                         &cb.d0, &cb.d1, &cb.d2, &cb.d3, &cb.prox);
+                                  [self.customDrawn setNeedsDisplay];
+                                  cb.linelen=0;
+                              }
+                          }
+                      }
+                  }
                 }
-                while ([self.imageStream hasBytesAvailable]) {
-//                    NSLog(@"image coming in cb.imagelenbytes=%d cb.imagebytes=%d cb.imagelen=%d sizeof(imagelen)%ld", cb.imagelenbytes, cb.imagebytes,
-  //                        cb.imagelen, sizeof(cb.imagelen));
-                    if (cb.imagelenbytes!=sizeof(cb.imagelen)) {
-                        len = [self.imageStream read:(uint8_t *)&(cb.image[cb.imagebytes]) maxLength:(sizeof(cb.imagelen)-cb.imagebytes)];
-//                        NSLog(@"len coming in len=%d cb.imagebytes=%d cb.imagelen=%d", len, cb.imagebytes,
- //                             cb.imagelen);
-                        if (len) {
-                            cb.imagelenbytes+=len;
-                            cb.imagelen=*((int *)cb.image);
-                            cb.imagebytes=0;
-                        }
-                    } else {
-                        cb.imagebytes += [self.imageStream read:(uint8_t *)&cb.image[cb.imagebytes] maxLength:cb.imagelen - cb.imagebytes ];
-//                        NSLog(@"body coming in cb.imagebytes=%d cb.imagelen=%d", cb.imagebytes,
- //                             cb.imagelen);
-                        if (cb.imagelen == cb.imagebytes) {
-                            NSData *idata = [NSData dataWithBytesNoCopy:cb.image  length:cb.imagelen freeWhenDone:NO];
- //                           NSLog(@"got image");
-                        // got a complete image display it and reset state
-                            UIImage *img = [[UIImage alloc] initWithData:idata];
-                            if (img) {
-                                self.cameraImage.image = img;
-                           //     NSLog(@"Image loaded to view");
-                              [self.cameraImage setNeedsDisplay];
-                            }
-                            cb.imagelen=0;
-                            cb.imagelenbytes=0;
-                            cb.imagebytes=0;
-                        }
-                            
-                    }
-                    
+                if (theStream==self.imageStream) {
+                  while ([self.imageStream hasBytesAvailable]) {
+//                      NSLog(@"image coming in cb.imagelenbytes=%d cb.imagebytes=%d cb.imagelen=%d sizeof(imagelen)%ld", cb.imagelenbytes, cb.imagebytes,
+//                          cb.imagelen, sizeof(cb.imagelen));
+                      if (cb.imagelenbytes!=sizeof(cb.imagelen)) {
+                          int ilen = [self.imageStream read:(uint8_t *)&(cb.image[cb.imagebytes]) maxLength:(sizeof(cb.imagelen)-cb.imagebytes)];
+//                          NSLog(@"len coming in len=%d cb.imagebytes=%d cb.imagelen=%d", ilen, cb.imagebytes,
+//                               cb.imagelen);
+                          if (ilen) {
+                              cb.imagelenbytes+=ilen;
+                              if (ilen == sizeof(cb.imagelen)) {
+                                  cb.imagelen=*((int *)cb.image);
+                                  cb.imagelen = ntohl(cb.imagelen);
+                                  cb.imagebytes=0;
+                              }
+                          }
+                     } else {
+                        int n = [self.imageStream read:(uint8_t *)&cb.image[cb.imagebytes] maxLength:cb.imagelen - cb.imagebytes ];
+//                         NSError *e=[self.imageStream streamError];
+//                         NSLog(@"body coming in cb.imagebytes=%d cb.imagelen=%d  n=%d %@ %@", cb.imagebytes,
+ //                             cb.imagelen, n, e, [e userInfo ]);
+                         if (n>0) {
+                             cb.imagebytes+=n;
+                             if (cb.imagelen == cb.imagebytes) {
+                                 NSData *idata = [NSData dataWithBytesNoCopy:cb.image  length:cb.imagelen freeWhenDone:NO];
+//                                 NSLog(@"got image");
+                                 // got a complete image display it and reset state
+                                 UIImage *img = [[UIImage alloc] initWithData:idata];
+                                 if (img) {
+                                     self.cameraImage.image = img;
+//                                     NSLog(@"Image loaded to view");
+                                     [self.cameraImage setNeedsDisplay];
+                                 }
+                                 cb.imagelen=0;
+                                 cb.imagelenbytes=0;
+                                 cb.imagebytes=0;
+                             }
+                         }
+                     }
+                  }
                 }
 //                NSString *response  = [NSString stringWithFormat:@"hello\n"];
 //                NSData *data = [[NSData alloc] initWithData:[response dataUsingEncoding:NSASCIIStringEncoding]];
@@ -256,8 +272,12 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 		case NSStreamEventErrorOccurred:
         {
 //			NSLog(@"Can not connect to the host!");
+//            NSError *e=[theStream streamError];
+//            NSLog(@"Error: %@ %@", e, [e userInfo ]);
+
             cb.cstate = DISCONNECTED;
             cb.volumeInit = 0;
+            cb.imageInit = 0;
             NSString *msg = [[NSString alloc] initWithFormat:@"FAILED to connect to %@:%@", self.serverAddr, self.serverPort];
             self.status.text = msg;
         }
@@ -266,8 +286,12 @@ static inline double radians (double degrees) { return degrees * M_PI/180; }
 		case NSStreamEventEndEncountered:
         {
 //            NSLog(@"Lost Connection host!");
+//            NSError *e=[theStream streamError];
+//            NSLog(@"End: %@ %@", e, [e userInfo ]);
+
             cb.cstate = DISCONNECTED;
             cb.volumeInit = 0;
+            cb.imageInit = 0;
             NSString *msg = [[NSString alloc] initWithFormat:@"LOST connection to %@:%@", self.serverAddr, self.serverPort];
             self.status.text = msg;
 

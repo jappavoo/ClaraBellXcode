@@ -17,7 +17,7 @@ struct ClaraBell cb = {
     .last_speed = SPEED_NONE, .last_dir=DIR_NONE,
     .last_offset=SPEED_OFF_NONE, .last_div = DIV_NONE,
     .cstate = DISCONNECTED,
-    .volumeInit = 0,
+    .volumeInit = 0, .imageInit=0
 };
 
 

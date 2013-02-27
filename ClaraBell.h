@@ -52,6 +52,7 @@ struct ClaraBell {
     int     lencoder, rencoder;
     enum CB_CONNECTION cstate;
     int  volumeInit;
+    int  imageInit;
     enum CB_DIRECTION last_dir;
     enum CB_SPEED last_speed;
     enum CB_SPEED_OFFSET last_offset;
